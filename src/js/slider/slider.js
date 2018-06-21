@@ -3,7 +3,8 @@
  */
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
-import {assign} from '../utils/obj';
+import { assign } from '../utils/obj';
+import { IS_CHROME } from '../utils/browser.js';
 
 /**
  * The base functionality for a slider. Can be vertical or horizontal.
@@ -12,16 +13,15 @@ import {assign} from '../utils/obj';
  * @extends Component
  */
 class Slider extends Component {
-
-/**
- * Create an instance of this class
- *
- * @param {Player} player
- *        The `Player` that this class should be attached to.
- *
- * @param {Object} [options]
- *        The key/value store of player options.
- */
+  /**
+   * Create an instance of this class
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -59,17 +59,23 @@ class Slider extends Component {
   createEl(type, props = {}, attributes = {}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
-    props = assign({
-      tabIndex: 0
-    }, props);
+    props = assign(
+      {
+        tabIndex: 0
+      },
+      props
+    );
 
-    attributes = assign({
-      'role': 'slider',
-      'aria-valuenow': 0,
-      'aria-valuemin': 0,
-      'aria-valuemax': 100,
-      'tabIndex': 0
-    }, attributes);
+    attributes = assign(
+      {
+        role: 'slider',
+        'aria-valuenow': 0,
+        'aria-valuemin': 0,
+        'aria-valuemax': 100,
+        tabIndex: 0
+      },
+      attributes
+    );
 
     return super.createEl(type, props, attributes);
   }
@@ -87,7 +93,17 @@ class Slider extends Component {
   handleMouseDown(event) {
     const doc = this.bar.el_.ownerDocument;
 
-    event.preventDefault();
+    if (event.type === 'mousedown') {
+      event.preventDefault();
+    }
+    // Do not call preventDefault() on touchstart in Chrome
+    // to avoid console warnings. Use a 'touch-action: none' style
+    // instead to prevent unintented scrolling.
+    // https://developers.google.com/web/updates/2017/01/scrolling-intervention
+    if (event.type === 'touchstart' && !IS_CHROME) {
+      event.preventDefault();
+    }
+
     Dom.blockTextSelection();
 
     this.addClass('vjs-sliding');
@@ -176,10 +192,12 @@ class Slider extends Component {
     }
 
     // Protect against no duration and other division issues
-    if (typeof progress !== 'number' ||
-        progress !== progress ||
-        progress < 0 ||
-        progress === Infinity) {
+    if (
+      typeof progress !== 'number' ||
+      progress !== progress ||
+      progress < 0 ||
+      progress === Infinity
+    ) {
       progress = 0;
     }
 
@@ -242,7 +260,7 @@ class Slider extends Component {
       event.preventDefault();
       this.stepBack();
 
-    // Up and Right Arrows
+      // Up and Right Arrows
     } else if (event.which === 38 || event.which === 39) {
       event.preventDefault();
       this.stepForward();
