@@ -128,7 +128,7 @@ var Slider = function (_Component) {
     // instead to prevent unintented scrolling.
     // https://developers.google.com/web/updates/2017/01/scrolling-intervention
     if (event.type === 'touchstart' && !_browser.IS_CHROME) {
-      event.preventDefault();
+      // event.preventDefault();
     }
     Dom.blockTextSelection();
 
@@ -143,7 +143,7 @@ var Slider = function (_Component) {
 
     this.on(doc, 'mousemove', this.handleMouseMove);
     this.on(doc, 'mouseup', this.handleMouseUp);
-    this.on(doc, 'touchmove', this.handleMouseMove);
+    // this.on(doc, 'touchmove', this.handleMouseMove);
     this.on(doc, 'touchend', this.handleMouseUp);
 
     this.handleMouseMove(event);
